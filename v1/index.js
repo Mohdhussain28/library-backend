@@ -15,6 +15,9 @@ app.use(bodyparser.urlencoded({ extended: true }))
 
 connectDB();
 
+app.get("/hi", async (req, res) => {
+    res.send("hello")
+})
 // app.use('/books', bookRoutes);
 app.use('/users', userRoutes);
 // app.use('/transactions', transactionRoutes);
