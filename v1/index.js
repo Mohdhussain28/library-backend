@@ -3,9 +3,9 @@ const cors = require('cors');
 const bodyparser = require('body-parser');
 const ckey = require('ckey')
 const connectDB = require('./config/database');
-// const bookRoutes = require('./routes/bookRoutes');
+const bookRoutes = require('./routes/bookRoutes');
 const userRoutes = require('./routes/userRoutes');
-// const transactionRoutes = require('./routes/transactionRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
 
 const app = express();
 
@@ -18,9 +18,9 @@ connectDB();
 app.get("/hi", async (req, res) => {
     res.send("hello")
 })
-// app.use('/books', bookRoutes);
+app.use('/books', bookRoutes);
 app.use('/users', userRoutes);
-// app.use('/transactions', transactionRoutes);
+app.use('/transactions', transactionRoutes);
 
 const PORT = ckey.PORT || 5000;
 app.listen(PORT, () => {

@@ -1,5 +1,5 @@
-const user = require('../model/user');
-const User = require('../model/user');
+const User = require('../models/user');
+const uuid = require("uuid")
 
 exports.getAllUsers = async (req, res) => {
     try {
@@ -13,7 +13,7 @@ exports.getAllUsers = async (req, res) => {
 exports.insertUsers = async (req, res) => {
     const name = req.body.name;
     const email = req.body.email;
-    const userId = req.body.userId;
+    const userId = uuid.v4();
     try {
         const users = await User.create({ name, email, userId });
         res.json(users)
