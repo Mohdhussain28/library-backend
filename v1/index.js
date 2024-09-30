@@ -10,8 +10,8 @@ const transactionRoutes = require('./routes/transactionRoutes');
 const app = express();
 
 app.use(cors({ origin: true }))
-app.use(bodyparser.json())
-app.use(bodyparser.urlencoded({ extended: true }))
+app.use(express.json())
+// app.use(bodyparser.urlencoded({ extended: true }))
 
 connectDB();
 

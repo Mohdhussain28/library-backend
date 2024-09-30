@@ -21,7 +21,7 @@ exports.returnBook = async (req, res) => {
     const { bookName, userId, returnDate } = req.body;
     try {
         const transaction = await Transaction.findOne({ bookName, userId, returnDate: null });
-
+        // console.log("object", transaction)
         if (transaction) {
             const issueDate = new Date(transaction.issueDate);
             const returnDateObj = new Date(returnDate);
@@ -50,9 +50,11 @@ exports.returnBook = async (req, res) => {
 
 
 exports.getTransactionByBookName = async (req, res) => {
-    const { bookName } = req.body.bookName;
+    const bookName = req.params.bookName;
+    console.log("he", bookName)
     try {
         const book = await Book.findOne({ bookName });
+
         if (book) {
             const transactions = await Transaction.find({ bookId: book._id }).populate('userId');
             const currentlyIssued = await Transaction.findOne({ bookId: book._id, returnDate: null });
@@ -71,7 +73,7 @@ exports.getTransactionByBookName = async (req, res) => {
 };
 
 exports.getRentByBookName = async (req, res) => {
-    const { bookName } = req.params;
+    const bookName = req.params.bookName;
     try {
         const book = await Book.findOne({ bookName });
         if (book) {
@@ -87,29 +89,45 @@ exports.getRentByBookName = async (req, res) => {
 };
 
 exports.getTransactionsByUser = async (req, res) => {
-    const { userId } = req.params;
+    const userId = req.params.userId;
     try {
         const transactions = await Transaction.find({ userId }).populate('bookId');
-        const books = transactions.map(t => t.bookId.bookName);
+        if (transactions.length === 0) {
+            return res.status(404).json({ message: 'No transactions found for this user.' });
+        }
+        const books = transactions.map(t => ({
+            bookName: t.bookName,
+            transactionDetails: t
+        }));
         res.json(books);
     } catch (err) {
         res.status(500).send(err);
     }
 };
 
+
 exports.getTransactionsByDateRange = async (req, res) => {
     const { startDate, endDate } = req.query;
     try {
         const transactions = await Transaction.find({
             issueDate: { $gte: new Date(startDate), $lte: new Date(endDate) }
-        }).populate('bookId userId');
+        })
+            .populate('bookId')
+            .populate({
+                path: '_id',
+                model: 'User',
+                select: 'name',
+            });
 
         res.json(transactions.map(t => ({
-            book: t.bookId.bookName,
-            issuedTo: t.userId.name,
+            book: t.bookName,
+            issuedTo: t.userId ? t.userId.name : 'Not found',
             issueDate: t.issueDate
         })));
     } catch (err) {
         res.status(500).send(err);
     }
 };
+
+
+
